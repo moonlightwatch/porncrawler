@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"encoding/json"
 
 	"time"
 
@@ -54,6 +55,13 @@ func (d *DataInterface) AddTarget(domain, url string) {
 
 func (d *DataInterface) AddSite(s SiteData) {
 	ctx := context.TODO()
-	dur, _ := time.ParseDuration("0s")
-	d.PornDB.Set(ctx, s.URL, s.Title, dur).Result()
+	siteData, err := json.Marshal(map[string]interface{}{
+		"title": s.Title,
+		"url":   s.URL,
+		"time":  time.Now().Unix(),
+	})
+	if err != nil {
+		return
+	}
+	d.PornDB.Set(ctx, s.URL, siteData, 720*time.Hour).Result() // 存一个月
 }
