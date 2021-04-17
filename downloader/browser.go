@@ -40,17 +40,14 @@ func (b *Browser) request(url string) data.SiteData {
 	text := ""
 	currentURL := ""
 
-	timeoutCtx, cancel := context.WithTimeout(b.baseContext, 30*time.Second)
-	defer cancel()
-
-	err := chromedp.Run(timeoutCtx,
+	err := chromedp.Run(b.baseContext,
 		chromedp.Navigate(url),
 		chromedp.WaitReady("body", chromedp.ByQuery),
 	)
 	if err != nil {
 		log.Println(err)
 	}
-	err = chromedp.Run(timeoutCtx,
+	err = chromedp.Run(b.baseContext,
 		chromedp.Evaluate(`document.URL;`, &currentURL),
 		chromedp.Title(&title),
 		// chromedp.Evaluate(`document.title;`, &title),
