@@ -18,13 +18,13 @@ func main() {
 	d := data.NewDataInterface(&redis.Options{Addr: os.Args[1], Password: os.Args[2]})
 	s := siteanalysis.NewSiteAnalyseTool(d)
 	browserList := []*downloader.Browser{}
-	browserList = append(browserList, downloader.NewBrowser(d, s))
-	browserList = append(browserList, downloader.NewBrowser(d, s))
-	browserList = append(browserList, downloader.NewBrowser(d, s))
+	browserList = append(browserList, downloader.NewBrowser("1", d, s))
+	browserList = append(browserList, downloader.NewBrowser("2", d, s))
+	browserList = append(browserList, downloader.NewBrowser("3", d, s))
 	for _, b := range browserList {
 		go b.RequestLoop()
 		time.Sleep(time.Second)
-		log.Println("start.")
+		log.Printf("(%s) start.\n", b.Name)
 	}
 	quit := make(chan os.Signal, 5)
 	signal.Notify(quit, os.Interrupt)
@@ -34,7 +34,7 @@ func main() {
 	}
 	for _, b := range browserList {
 		<-b.Stopped
-		log.Println("stoped.")
+		log.Printf("(%s) stoped.\n", b.Name)
 	}
 	d.Close()
 }

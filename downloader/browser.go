@@ -10,8 +10,9 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-func NewBrowser(d *data.DataInterface, s *siteanalysis.SiteAnalyseTool) *Browser {
+func NewBrowser(name string, d *data.DataInterface, s *siteanalysis.SiteAnalyseTool) *Browser {
 	b := &Browser{}
+	b.Name = name
 	b.baseContext, b.cancel = chromedp.NewContext(context.Background())
 	b.d = d
 	b.s = s
@@ -20,6 +21,7 @@ func NewBrowser(d *data.DataInterface, s *siteanalysis.SiteAnalyseTool) *Browser
 }
 
 type Browser struct {
+	Name        string
 	baseContext context.Context
 	cancel      context.CancelFunc
 	d           *data.DataInterface
@@ -45,7 +47,7 @@ func (b *Browser) request(url string) data.SiteData {
 		chromedp.WaitReady("body", chromedp.ByQuery),
 	)
 	if err != nil {
-		log.Println(err)
+		log.Printf("(%s) %v\n", b.Name, err)
 	}
 	err = chromedp.Run(b.baseContext,
 		chromedp.Evaluate(`document.URL;`, &currentURL),
@@ -55,7 +57,7 @@ func (b *Browser) request(url string) data.SiteData {
 		chromedp.Evaluate(`var l=new Array();for(var i=0;i<document.links.length;i++){l.push(document.links[i].href);};l`, &urls),
 	)
 	if err != nil {
-		log.Println(err)
+		log.Printf("(%s) %v\n", b.Name, err)
 	}
 
 	return data.SiteData{
@@ -75,7 +77,7 @@ func (b *Browser) RequestLoop() {
 			time.Sleep(time.Second)
 			continue
 		}
-		log.Printf("request: %s\n", t)
+		log.Printf("(%s) request: %s\n", b.Name, t)
 		site := b.request(t)
 		b.s.CheckSite(site)
 
