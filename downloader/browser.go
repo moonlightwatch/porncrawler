@@ -12,7 +12,9 @@ import (
 
 func NewBrowser(d *data.DataInterface, s *siteanalysis.SiteAnalyseTool) *Browser {
 	b := &Browser{}
-	b.baseContext, b.cancel = chromedp.NewContext(context.Background())
+	var ctx context.Context
+	ctx, b.cancel1 = chromedp.NewContext(context.Background())
+	b.baseContext, b.cancel2 = context.WithTimeout(ctx, 30*time.Second)
 	b.d = d
 	b.s = s
 	b.Stopped = make(chan bool)
@@ -21,7 +23,8 @@ func NewBrowser(d *data.DataInterface, s *siteanalysis.SiteAnalyseTool) *Browser
 
 type Browser struct {
 	baseContext context.Context
-	cancel      context.CancelFunc
+	cancel1     context.CancelFunc
+	cancel2     context.CancelFunc
 	d           *data.DataInterface
 	s           *siteanalysis.SiteAnalyseTool
 	running     bool
@@ -30,7 +33,9 @@ type Browser struct {
 
 func (b *Browser) Close() {
 	b.running = false
-	b.cancel()
+	b.cancel2()
+	b.cancel1()
+
 }
 
 func (b *Browser) request(url string) data.SiteData {
@@ -77,6 +82,7 @@ func (b *Browser) RequestLoop() {
 			time.Sleep(time.Second)
 			continue
 		}
+		log.Printf("request: %s\n", t)
 		site := b.request(t)
 		b.s.CheckSite(site)
 

@@ -30,7 +30,7 @@ func main() {
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 	for _, b := range browserList {
-		b.Close()
+		go b.Close()
 	}
 	for _, b := range browserList {
 		<-b.Stopped
