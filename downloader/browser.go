@@ -12,9 +12,7 @@ import (
 
 func NewBrowser(d *data.DataInterface, s *siteanalysis.SiteAnalyseTool) *Browser {
 	b := &Browser{}
-	var ctx context.Context
-	ctx, b.cancel1 = chromedp.NewContext(context.Background())
-	b.baseContext, b.cancel2 = context.WithTimeout(ctx, 30*time.Second)
+	b.baseContext, b.cancel = chromedp.NewContext(context.Background())
 	b.d = d
 	b.s = s
 	b.Stopped = make(chan bool)
@@ -23,8 +21,7 @@ func NewBrowser(d *data.DataInterface, s *siteanalysis.SiteAnalyseTool) *Browser
 
 type Browser struct {
 	baseContext context.Context
-	cancel1     context.CancelFunc
-	cancel2     context.CancelFunc
+	cancel      context.CancelFunc
 	d           *data.DataInterface
 	s           *siteanalysis.SiteAnalyseTool
 	running     bool
@@ -33,8 +30,7 @@ type Browser struct {
 
 func (b *Browser) Close() {
 	b.running = false
-	b.cancel2()
-	b.cancel1()
+	b.cancel()
 
 }
 
@@ -43,18 +39,18 @@ func (b *Browser) request(url string) data.SiteData {
 	urls := []string{}
 	text := ""
 	currentURL := ""
-	err := chromedp.Run(b.baseContext)
-	if err != nil {
-		log.Println(err)
-	}
-	err = chromedp.Run(b.baseContext,
+
+	timeoutCtx, cancel := context.WithTimeout(b.baseContext, 30*time.Second)
+	defer cancel()
+
+	err := chromedp.Run(timeoutCtx,
 		chromedp.Navigate(url),
 		chromedp.WaitReady("body", chromedp.ByQuery),
 	)
 	if err != nil {
 		log.Println(err)
 	}
-	err = chromedp.Run(b.baseContext,
+	err = chromedp.Run(timeoutCtx,
 		chromedp.Evaluate(`document.URL;`, &currentURL),
 		chromedp.Title(&title),
 		// chromedp.Evaluate(`document.title;`, &title),
