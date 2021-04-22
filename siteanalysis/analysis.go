@@ -21,7 +21,7 @@ func SetJieba() {
 
 func NewSiteAnalyseTool(d *data.DataInterface) *SiteAnalyseTool {
 	s := &SiteAnalyseTool{}
-	s.jieba = gojieba.NewJieba()
+	s.jieba = gojieba.NewJieba(gojieba.DICT_PATH)
 	s.d = d
 	return s
 }
