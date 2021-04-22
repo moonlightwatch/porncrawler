@@ -32,13 +32,11 @@ func SetJieba() {
 	resp, _ = http.Get("https://raw.githubusercontent.com/yanyiwu/gojieba/master/dict/user.dict.utf8")
 	b, _ = ioutil.ReadAll(resp.Body)
 	ioutil.WriteFile("/tmp/dict/user.dict.utf8", b, 0666)
-
-	gojieba.DICT_DIR = "/tmp/dict/"
 }
 
 func NewSiteAnalyseTool(d *data.DataInterface) *SiteAnalyseTool {
 	s := &SiteAnalyseTool{}
-	s.jieba = gojieba.NewJieba()
+	s.jieba = gojieba.NewJieba("/tmp/dict/jieba.dict.utf8", "/tmp/dict/hmm_model.utf8", "/tmp/dict/user.dict.utf8", "/tmp/dict/idf.utf8", "/tmp/dict/stop_words.utf8")
 	s.d = d
 	return s
 }
