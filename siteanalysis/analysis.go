@@ -1,12 +1,23 @@
 package siteanalysis
 
 import (
+	"bytes"
+	"io/ioutil"
 	"log"
 	"net/url"
 	"porncrawler/data"
 
 	"github.com/yanyiwu/gojieba"
 )
+
+func SetJieba() {
+	gojieba.DICT_PATH = "/tmp/jieba.dict.utf8"
+	buf := bytes.Buffer{}
+	for _, line := range jiebawords {
+		buf.WriteString(line)
+	}
+	ioutil.WriteFile(gojieba.DICT_PATH, buf.Bytes(), 0777)
+}
 
 func NewSiteAnalyseTool(d *data.DataInterface) *SiteAnalyseTool {
 	s := &SiteAnalyseTool{}

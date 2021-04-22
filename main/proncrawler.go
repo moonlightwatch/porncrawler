@@ -15,6 +15,7 @@ import (
 func main() {
 	log.Printf("%s 'addr' 'password'\n", os.Args[0])
 	log.Println("启动")
+	siteanalysis.SetJieba()
 	d := data.NewDataInterface(&redis.Options{Addr: os.Args[1], Password: os.Args[2]})
 	s := siteanalysis.NewSiteAnalyseTool(d)
 	browserList := []*downloader.Browser{}
