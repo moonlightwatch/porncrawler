@@ -1,27 +1,44 @@
 package siteanalysis
 
 import (
-	"bytes"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"net/url"
+	"os"
 	"porncrawler/data"
 
 	"github.com/yanyiwu/gojieba"
 )
 
 func SetJieba() {
-	gojieba.DICT_PATH = "/tmp/jieba.dict.utf8"
-	buf := bytes.Buffer{}
-	for _, line := range jiebawords {
-		buf.WriteString(line)
-	}
-	ioutil.WriteFile(gojieba.DICT_PATH, buf.Bytes(), 0777)
+	os.MkdirAll("/tmp/dict", 0666)
+	resp, _ := http.Get("https://raw.githubusercontent.com/yanyiwu/gojieba/master/dict/hmm_model.utf8")
+	b, _ := ioutil.ReadAll(resp.Body)
+	ioutil.WriteFile("/tmp/dict/hmm_model.utf8", b, 0666)
+
+	resp, _ = http.Get("https://raw.githubusercontent.com/yanyiwu/gojieba/master/dict/idf.utf8")
+	b, _ = ioutil.ReadAll(resp.Body)
+	ioutil.WriteFile("/tmp/dict/idf.utf8", b, 0666)
+
+	resp, _ = http.Get("https://raw.githubusercontent.com/yanyiwu/gojieba/master/dict/jieba.dict.utf8")
+	b, _ = ioutil.ReadAll(resp.Body)
+	ioutil.WriteFile("/tmp/dict/jieba.dict.utf8", b, 0666)
+
+	resp, _ = http.Get("https://raw.githubusercontent.com/yanyiwu/gojieba/master/dict/stop_words.utf8")
+	b, _ = ioutil.ReadAll(resp.Body)
+	ioutil.WriteFile("/tmp/dict/stop_words.utf8", b, 0666)
+
+	resp, _ = http.Get("https://raw.githubusercontent.com/yanyiwu/gojieba/master/dict/user.dict.utf8")
+	b, _ = ioutil.ReadAll(resp.Body)
+	ioutil.WriteFile("/tmp/dict/user.dict.utf8", b, 0666)
+
+	gojieba.DICT_DIR = "/tmp/dict/"
 }
 
 func NewSiteAnalyseTool(d *data.DataInterface) *SiteAnalyseTool {
 	s := &SiteAnalyseTool{}
-	s.jieba = gojieba.NewJieba(gojieba.DICT_PATH)
+	s.jieba = gojieba.NewJieba()
 	s.d = d
 	return s
 }
