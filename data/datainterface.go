@@ -63,5 +63,5 @@ func (d *DataInterface) AddSite(s SiteData) {
 	if err != nil {
 		return
 	}
-	d.PornDB.Set(ctx, s.URL, siteData, 720*time.Hour).Result() // 存一个月
+	d.PornDB.Set(ctx, s.URL, siteData, 240*time.Hour).Result() // 存十天
 }
