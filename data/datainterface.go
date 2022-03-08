@@ -14,12 +14,12 @@ func NewDataInterface(opt *redis.Options) *DataInterface {
 	d.QueueDB = redis.NewClient(&redis.Options{
 		Addr:     opt.Addr,
 		Password: opt.Password,
-		DB:       0,
+		DB:       2,
 	})
 	d.PornDB = redis.NewClient(&redis.Options{
 		Addr:     opt.Addr,
 		Password: opt.Password,
-		DB:       1,
+		DB:       3,
 	})
 	return d
 }
